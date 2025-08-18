@@ -30,7 +30,7 @@ function page() {
       <Navbar/>
       <Hero/>
       {/* <Testimonials/> */}
-      <Process/>
+      {/* <Process/> */}
       <Services/>
       <Footer/>
     </div>
