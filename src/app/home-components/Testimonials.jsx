@@ -47,7 +47,7 @@ const testimonialsData = [
 function Testimonials() {
   const containerRef = useRef(null);
   const titleRef = useRef(null);
-  const cardsRef = useRef(null);
+  const contentRef = useRef(null);
   const animationsInitialized = useRef(false);
 
   const initializeAnimations = useCallback(() => {
@@ -57,8 +57,19 @@ function Testimonials() {
     const { gsap } = window;
     gsap.registerPlugin(window.ScrollTrigger);
 
+    // Clear existing animations
     window.ScrollTrigger.getAll().forEach(trigger => trigger.kill());
 
+    // Pin the title to the top of the container
+    ScrollTrigger.create({
+      trigger: containerRef.current,
+      start: "top top",
+      end: "bottom bottom",
+      pin: titleRef.current,
+      pinSpacing: false
+    });
+
+    // Card animations
     document.querySelectorAll('.testimonial-card').forEach((card, index) => {
       gsap.to(card, {
         y: -30 * (index % 2),
@@ -83,14 +94,15 @@ function Testimonials() {
         stagger: 0.15,
         ease: "power3.out",
         scrollTrigger: {
-          trigger: cardsRef.current,
-          start: "top 85%",
+          trigger: contentRef.current,
+          start: "top 60%",
           toggleActions: "play none none reverse",
           invalidateOnRefresh: true
         }
       }
     );
 
+    // Hover effects
     document.querySelectorAll('.testimonial-card').forEach(card => {
       const handleMouseEnter = () => {
         gsap.to(card, {
@@ -173,12 +185,11 @@ function Testimonials() {
     patterns.forEach((cardsInRow, rowIndex) => {
       if (cardIndex >= testimonialsData.length) return;
       const rowCards = testimonialsData.slice(cardIndex, cardIndex + cardsInRow);
-      const isFirstRow = rowIndex === 0;
 
       layout.push(
         <div
           key={`row-${cardIndex}`}
-          className={`w-full flex justify-center items-stretch mb-24 ${cardsInRow === 2 ? 'gap-32' : ''} ${isFirstRow ? 'pt-[30vh]' : ''}`}
+          className={`w-full flex justify-center items-stretch mb-24 ${cardsInRow === 2 ? 'gap-32' : ''}`}
         >
           {rowCards.map((testimonial) => (
             <TestimonialCard key={testimonial.id} testimonial={testimonial} />
@@ -193,11 +204,12 @@ function Testimonials() {
   }, []);
 
   return (
-    <div ref={containerRef} className='min-h-screen bg-black text-white relative overflow-hidden'>
-      <div ref={titleRef} className="fixed leading-none top-0 left-0 w-full z-50 bg-black bg-opacity-90 backdrop-blur-sm">
-        <div className="text-center py-8">
+    <div ref={containerRef} className='relative bg-black text-white overflow-hidden min-h-screen'>
+      {/* Title section - pinned to top of component */}
+      <div ref={titleRef} className="w-full z-50 bg-black bg-opacity-90 backdrop-blur-sm">
+        <div className="text-center py-8 leading-none">
           <h3
-            className='font-extrabold bg-gradient-to-r from-white via-gray-300 to-white bg-clip-text text-transparent select-none'
+            className='font-extrabold leading-none bg-gradient-to-r from-white via-gray-300 to-white bg-clip-text text-transparent select-none'
             style={{
               fontSize: '14vw',
               textShadow: '0 0 30px rgba(255,255,255,0.3)',
@@ -209,7 +221,8 @@ function Testimonials() {
         </div>
       </div>
 
-      <div ref={cardsRef} className="flex flex-col gap-16 pb-24 px-4 sm:px-12">
+      {/* Content section with proper scrolling */}
+      <div ref={contentRef} className="relative z-10 pb-24 px-4 sm:px-12" style={{ marginTop: '20vh' }}>
         {renderTestimonialLayout()}
       </div>
     </div>
@@ -218,26 +231,23 @@ function Testimonials() {
 
 const TestimonialCard = React.memo(({ testimonial }) => {
   return (
-    <div className="testimonial-card bg-white min-h-[550px]  w-[380px] border border-gray-200 rounded-2xl shadow-xl hover:shadow-lg transition-transform duration-300 transform-gpu will-change-transform ">
-      <div className="w-[380px] h-full bg-yellow-50 flex flex-col items-center justify-center gap-9 ">
+    <div className="testimonial-card   min-h-[550px] w-[380px] border  border-gray-200 rounded-2xl shadow-xl hover:shadow-lg transition-transform duration-300 transform-gpu will-change-transform" style={{marginBottom: "70px"}}>
+      <div className="w-[380px]   h-full  bg-yellow-50 flex flex-col items-center justify-center gap-9" >
         <img
           src={testimonial.image}
           alt="Customer testimonial"
-          className="w-[340px]  object-cover object-center rounded-lg "
+          className="w-[340px] object-cover object-center rounded-lg"
           loading="lazy"
           decoding="async"
         />
-        <p className="text-center text-gray-800 text-lg pb-12  font-bold leading-relaxed">
+        <p className="text-center text-gray-800 text-lg pb-12 font-bold leading-relaxed">
           {testimonial.text}
         </p>
       </div>
+     
     </div>
   );
 });
-
-
-
-
 
 TestimonialCard.displayName = 'TestimonialCard';
 

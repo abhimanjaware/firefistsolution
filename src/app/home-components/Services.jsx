@@ -46,12 +46,12 @@ function Services() {
   const [hoveredIndex, setHoveredIndex] = useState(null);
 
   return (
-    <div className="service-interface bg-black min-h-[130vh]  w-full z-[70]" style={{paddingTop:"10vw"}}>
+    <div className="service-interface bg-black min-h-[130vh] w-full z-[70]" style={{ paddingTop: "10vw" }}>
       <div className="heading w-full h-[15vh] text-center flex flex-col items-center justify-center">
         <h3 className="leading-none text-white font-extrabold" style={{ fontSize: "7vw", fontWeight: "800" }}>
           CRAFTED{" "}
           <span
-            className={`${gideon.className}  transition-all duration-300 ease-in-out ${
+            className={`${gideon.className} transition-all duration-300 ease-in-out ${
               hoveredIndex !== null
                 ? "text-transparent bg-clip-text bg-gradient-to-r from-white to-green-400"
                 : "text-white"
@@ -62,7 +62,7 @@ function Services() {
         </h3>
         {/* Gradient Dash Underline */}
         <div
-          className={`h-[2px] w-[10vw]  mt-2 rounded-full transition-all duration-300 ${
+          className={`h-[2px] w-[10vw] mt-2 rounded-full transition-all duration-300 ${
             hoveredIndex !== null
               ? "opacity-100 bg-gradient-to-r from-white to-green-400"
               : "opacity-0"
@@ -74,10 +74,12 @@ function Services() {
         {servicesData.map((service, index) => (
           <div
             key={index}
-            className={`group relative h-[75vh] w-[30vw] rounded-2xl overflow-hidden border border-gray-400 bg-black text-white transform transition-transform duration-500 ${
-              hoveredIndex === index ? "scale-105" : "scale-100"
+            className={`group relative h-[75vh] w-[30vw] rounded-2xl overflow-hidden border bg-black text-white transform transition-all duration-500 ${
+              hoveredIndex === index
+                ? "scale-105 border-green-400 shadow-[0_0_15px_rgba(34,197,94,0.35)]"
+                : "scale-100 border-[#212529] shadow-none"
             }`}
-            style={{ border: "1px solid #212529", marginBottom: index === 1 ? "20px" : "0px" }}
+            style={{ marginBottom: index === 1 ? "20px" : "0px" }}
             onMouseEnter={() => setHoveredIndex(index)}
             onMouseLeave={() => setHoveredIndex(null)}
           >

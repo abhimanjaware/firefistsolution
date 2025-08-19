@@ -29,10 +29,10 @@ function page() {
       <Loader/>
       <Navbar/>
       <Hero/>
-      {/* <Testimonials/> */}
-      {/* <Process/> */}
+      <Testimonials/>
       <Services/>
       <Footer/>
+      <Process/>
     </div>
    </div>
   )
