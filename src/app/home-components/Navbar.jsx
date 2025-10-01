@@ -109,11 +109,12 @@ const Navbar = () => {
 
         {/* Logo */}
         <a href="/" onClick={(e) => handleNavigation(e, "/")}>
-          <img
+          {/* <img
             alt="logo"
             src="/logogogogogo.png"
             className="w-[16vw] md:w-[9vw] lg:w-[4.5vw] brightness-200 saturate-200 contrast-0 transition-transform duration-300 hover:scale-105"
-          />
+          /> */}
+          <h3 className="text-white font-[Familjen_Grotesk] tracking-wide font-black  " style={{fontSize:"1.5vw", padding:"20px 20px"}} >FIREFIST SOLUTIONS</h3>
         </a>
 
         {/* Desktop Menu */}

@@ -34,150 +34,46 @@ const processData = [
 
 function Process() {
   const containerRef = useRef(null);
-  const titleRef = useRef(null);
-  const contentRef = useRef(null);
-  const animationsInitialized = useRef(false);
   const [hoveredCard, setHoveredCard] = useState(null);
+  const [isMobile, setIsMobile] = useState(false);
+  const [isTablet, setIsTablet] = useState(false);
 
-  const initializeAnimations = useCallback(() => {
-    if (animationsInitialized.current || !window.gsap || !window.ScrollTrigger) return;
-
-    animationsInitialized.current = true;
-    const { gsap } = window;
-    gsap.registerPlugin(window.ScrollTrigger);
-
-    window.ScrollTrigger.getAll().forEach(trigger => trigger.kill());
-
-    // Pin the title
-    window.ScrollTrigger.create({
-      trigger: containerRef.current,
-      start: "top top",
-      end: "bottom bottom",
-      pin: titleRef.current,
-      pinSpacing: false
-    });
-
-    // Animate cards - faster and smoother, only once
-    document.querySelectorAll('.process-card').forEach((card, index) => {
-      gsap.fromTo(card,
-        { 
-          opacity: 0, 
-          y: 60, 
-          scale: 0.98,
-          rotationX: 5
-        },
-        {
-          opacity: 1,
-          y: 0,
-          scale: 1,
-          rotationX: 0,
-          duration: 0.8,
-          ease: "power2.out",
-          scrollTrigger: {
-            trigger: card,
-            start: "top 85%",
-            toggleActions: "play none none none", // Only play once
-            invalidateOnRefresh: true
-          }
-        }
-      );
-    });
-
-    // Animate numbers with stagger effect
-    document.querySelectorAll('.process-number-display').forEach((number, index) => {
-      gsap.fromTo(number,
-        { 
-          opacity: 0, 
-          x: -40,
-          scale: 0.8
-        },
-        {
-          opacity: 1,
-          x: 0,
-          scale: 1,
-          duration: 0.6,
-          delay: index * 0.15,
-          ease: "back.out(1.4)",
-          scrollTrigger: {
-            trigger: number,
-            start: "top 85%",
-            toggleActions: "play none none none" // Only play once
-          }
-        }
-      );
-    });
-
-    // Animate card content
-    document.querySelectorAll('.card-content').forEach((content, index) => {
-      gsap.fromTo(content,
-        { 
-          opacity: 0, 
-          y: 30
-        },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.7,
-          delay: 0.2,
-          ease: "power2.out",
-          scrollTrigger: {
-            trigger: content,
-            start: "top 85%",
-            toggleActions: "play none none none" // Only play once
-          }
-        }
-      );
-    });
-
+  // Device detection
+  useEffect(() => {
+    const checkDevice = () => {
+      const width = window.innerWidth;
+      setIsMobile(width < 768);
+      setIsTablet(width >= 768 && width < 1024);
+    };
+    
+    checkDevice();
+    window.addEventListener('resize', checkDevice);
+    return () => window.removeEventListener('resize', checkDevice);
   }, []);
 
+  // Auto-hover first card on mobile for better UX
   useEffect(() => {
-    let scriptsLoaded = 0;
-    const totalScripts = 2;
-
-    const checkScriptsLoaded = () => {
-      scriptsLoaded++;
-      if (scriptsLoaded === totalScripts) {
-        setTimeout(initializeAnimations, 100);
-      }
-    };
-
-    const script = document.createElement('script');
-    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js';
-    script.onload = checkScriptsLoaded;
-    script.onerror = () => console.error('Failed to load GSAP');
-    document.head.appendChild(script);
-
-    const scrollTriggerScript = document.createElement('script');
-    scrollTriggerScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js';
-    scrollTriggerScript.onload = checkScriptsLoaded;
-    scrollTriggerScript.onerror = () => console.error('Failed to load ScrollTrigger');
-    document.head.appendChild(scrollTriggerScript);
-
-    return () => {
-      animationsInitialized.current = false;
-      if (window.ScrollTrigger) {
-        window.ScrollTrigger.getAll().forEach(trigger => trigger.kill());
-      }
-
-      [script, scrollTriggerScript].forEach(scriptEl => {
-        if (scriptEl && document.head.contains(scriptEl)) {
-          document.head.removeChild(scriptEl);
-        }
-      });
-    };
-  }, [initializeAnimations]);
+    if (isMobile && hoveredCard === null) {
+      setHoveredCard(0);
+    }
+  }, [isMobile, hoveredCard]);
 
   const handleCardHover = (index) => {
-    setHoveredCard(index);
+    if (!isMobile) setHoveredCard(index);
   };
 
   const handleCardLeave = () => {
-    setHoveredCard(null);
+    if (!isMobile) setHoveredCard(null);
+  };
+
+  const handleCardClick = (index) => {
+    if (isMobile) {
+      setHoveredCard(hoveredCard === index ? 0 : index);
+    }
   };
 
   return (
-    <div ref={containerRef} className='relative bg-black text-white overflow-hidden min-h-screen'>
+    <div ref={containerRef} className='relative flex flex-col items-center bg-black text-white overflow-hidden min-h-screen'>
       <style jsx global>{`
         @import url('https://fonts.googleapis.com/css2?family=Gideon+Roman:wght@400&display=swap');
         
@@ -197,21 +93,21 @@ function Process() {
       `}</style>
 
       {/* Fixed Title */}
-      <div ref={titleRef} className="w-full  bg-black bg-opacity-90 backdrop-blur-sm">
-        <div className="text-center py-8 leading-none">
+      <div className="w-full bg-black bg-opacity-90 backdrop-blur-sm z-20 relative">
+        <div className={`text-center leading-none ${isMobile ? 'py-8 my-8' : 'py-8'}`}>
           <h3
-            className="font-extrabold leading-none select-none transition-all duration-500"
+            className="font-extrabold leading-none select-none"
             style={{
-              fontSize: 'clamp(4rem, 10vw, 12rem)',
-              textShadow: '0 0 30px rgba(255,255,255,0.3)',
-              willChange: 'transform',
-              fontFamily: 'Gideon Roman, serif'
+              fontSize: isMobile ? 'clamp(2rem, 10vw, 4rem)' : 'clamp(2.5rem, 8vw, 8rem)',
+              textShadow: '0 0 20px rgba(255,255,255,0.3)',
+              fontFamily: 'Gideon Roman, serif',
+              paddingTop:"8vw"
             }}
           >
             <span className="font-sans text-white">OUR</span>{' '}
             <span 
-              className={`bg-clip-text text-transparent transition-all duration-500 ${
-                hoveredCard !== null 
+              className={`bg-clip-text text-transparent ${
+                hoveredCard !== null && !isMobile
                   ? 'bg-gradient-to-r from-white to-green-400' 
                   : 'bg-gradient-to-r from-white via-gray-300 to-white'
               }`}
@@ -224,42 +120,43 @@ function Process() {
       </div>
 
       {/* Content */}
-      <div ref={contentRef} className="relative z-10 pb-24 px-4 sm:px-12 max-w-7xl mx-auto" style={{ marginTop: '20vh' }}>
-        <div className="flex flex-col gap-24 w-full">
+      <div className="relative z-10 pb-12 md:pb-24 px-4 sm:px-6 lg:px-8 w-full max-w-7xl mx-auto" 
+           style={{ marginTop: isMobile ? '2vh' : isTablet ? '10vh' : '20vh' }}>
+        
+        <div className="flex flex-col gap-6 md:gap-16 lg:gap-24 w-full">
           {processData.map((process, index) => (
-            <div key={process.id} className={`w-full flex ${
-              // Zig-zag pattern aligned with "OUR" and "PROCESS"
-              index % 2 === 0 
-                ? 'justify-start' 
-                : 'justify-end'
-            }`}>
+            <div key={process.id} className={`w-full flex ${isMobile ? 'justify-center' : index % 2 === 0 ? 'justify-start' : 'justify-end'}`}>
+              
               {/* Card */}
               <div 
-                className={`process-card relative min-h-[400px] w-full max-w-4xl lg:max-w-3xl xl:max-w-4xl border-2 rounded-2xl shadow-lg transition-all duration-300 transform-gpu will-change-transform overflow-hidden ${
-                  hoveredCard === index 
-                    ? 'border-green-400 shadow-green-400/20' 
-                    : 'border-gray-500 shadow-black/20'
-                }`}
+                className={`relative min-h-[220px] md:min-h-[340px] lg:min-h-[400px] w-full max-w-md md:max-w-2xl lg:max-w-3xl xl:max-w-4xl border-2 rounded-2xl shadow-lg transition-all duration-300 transform-gpu overflow-hidden ${
+                  (hoveredCard === index) ? 'border-green-400 shadow-green-400/20 scale-[1.02]' : 'border-gray-500 shadow-black/20'
+                } ${isMobile ? 'cursor-pointer' : ''}`}
                 style={{
-                  boxShadow: hoveredCard === index 
-                    ? '0 0 30px rgba(74, 222, 128, 0.3), 0 10px 40px rgba(0, 0, 0, 0.3)' 
-                    : '0 4px 20px rgba(0, 0, 0, 0.2)'
+                  boxShadow: (hoveredCard === index) 
+                    ? '0 0 20px rgba(74, 222, 128, 0.3), 0 8px 30px rgba(0, 0, 0, 0.3)' 
+                    : '0 4px 15px rgba(0, 0, 0, 0.2)',
                 }}
                 onMouseEnter={() => handleCardHover(index)}
                 onMouseLeave={handleCardLeave}
+                onClick={() => handleCardClick(index)}
               >
-                <div className="card-content relative h-full w-full bg-gradient-to-br from-gray-900 to-black flex flex-col md:flex-row items-start md:items-center justify-start gap-8 p-10 md:p-16">
+                <div className={`relative h-full w-full bg-gradient-to-br from-gray-900 to-black flex flex-col md:flex-row items-start md:items-center justify-start gap-4 md:gap-6 lg:gap-8 ${
+                  isMobile ? 'p-6' : 'p-6 md:p-8 lg:p-10 xl:p-12'
+                }`} style={{padding:"10px"}}>
                   
-                  {/* Large number inside card - always on left */}
-                  <div className="flex-shrink-0 ">
+                  {/* Number */}
+                  <div className="flex-shrink-0">
                     <div 
-                      className={`process-number-display font-bold leading-none transition-all duration-300 text-left ${
-                        hoveredCard === index ? 'gradient-text-hover' : 'gradient-text'
+                      className={`font-bold leading-none text-left ${
+                        (hoveredCard === index) ? 'gradient-text-hover' : 'gradient-text'
                       }`}
                       style={{
-                        fontSize: 'clamp(5rem, 10vw, 8rem)',
+                        fontSize: isMobile ? 'clamp(2.5rem, 10vw, 3.5rem)' : 'clamp(3rem, 8vw, 5rem)',
                         fontFamily: 'Gideon Roman, serif',
-                        textShadow: hoveredCard === index ? '0 0 20px rgba(251, 191, 36, 0.5)' : '0 0 20px rgba(34, 197, 94, 0.3)'
+                        textShadow: (hoveredCard === index) 
+                          ? '0 0 15px rgba(251, 191, 36, 0.5)' 
+                          : '0 0 15px rgba(34, 197, 94, 0.3)',
                       }}
                     >
                       {process.number}
@@ -267,36 +164,38 @@ function Process() {
                   </div>
 
                   {/* Content */}
-                  <div className="flex-1 space-y-6 text-left">
+                  <div className="flex-1 space-y-2 md:space-y-4 lg:space-y-6 text-left">
                     <h4 
-                      className={`text-3xl md:text-4xl lg:text-5xl font-bold text-white tracking-wide transition-all duration-300 ${
-                        hoveredCard === index ? 'text-green-400' : 'text-gray-100'
+                      className={`text-lg md:text-xl lg:text-2xl xl:text-3xl font-bold tracking-wide transition-colors duration-300 ${
+                        (hoveredCard === index) ? 'text-green-400' : 'text-gray-100'
                       }`}
                       style={{ fontFamily: 'Gideon Roman, serif' }}
                     >
                       {process.title}
                     </h4>
                     
-                    <h5 className={`text-xl md:text-2xl font-sans italic transition-all duration-300 ${
-                      hoveredCard === index ? 'text-yellow-300' : 'text-amber-200'
+                    <h5 className={`text-base md:text-lg lg:text-xl font-sans italic transition-colors duration-300 ${
+                      (hoveredCard === index) ? 'text-yellow-300' : 'text-amber-200'
                     }`}>
                       {process.subtitle}
                     </h5>
                     
-                    <p className={`font-sans text-lg md:text-xl leading-relaxed tracking-wide transition-all duration-300 ${
-                      hoveredCard === index ? 'text-gray-200' : 'text-zinc-300'
+                    <p className={`font-sans text-sm md:text-base lg:text-lg leading-relaxed tracking-wide transition-colors duration-300 ${
+                      (hoveredCard === index) ? 'text-gray-200' : 'text-zinc-300'
                     }`}>
                       {process.description}
                     </p>
                   </div>
                 </div>
 
-                {/* Hover effect overlay */}
-                <div 
-                  className={`absolute inset-0 bg-gradient-to-r from-green-400/5 to-transparent opacity-0 transition-opacity duration-300 pointer-events-none ${
-                    hoveredCard === index ? 'opacity-100' : 'opacity-0'
-                  }`}
-                />
+                {/* Hover effect overlay - desktop only */}
+                {!isMobile && (
+                  <div 
+                    className={`absolute inset-0 bg-gradient-to-r from-green-400/5 to-transparent transition-opacity duration-300 pointer-events-none ${
+                      hoveredCard === index ? 'opacity-100' : 'opacity-0'
+                    }`}
+                  />
+                )}
               </div>
             </div>
           ))}

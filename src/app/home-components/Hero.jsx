@@ -15,7 +15,7 @@ function Hero() {
         
         {/* Center Text */}
         <p className="text-white font-extrabold absolute top-[40%] z-10 text-[4vw] text-center leading-none">
-          PREMIUM ANIMATED EXPERIENCE FOR <br />
+          PREMIUM ANIMATED EXPERIENCE FORS <br />
           <span className={`${gideon.className} font-bold`}>VISIONARY BRANDS</span>
         </p>
 

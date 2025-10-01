@@ -14,8 +14,7 @@ function Loader() {
             if (leftHalf && rightHalf) {
                 // Animate left half to the left
                 leftHalf.style.transition = 'transform 1s ease-in-out'
-                leftHalf.style.transform = 'translateX(-100%)'
-                
+                leftHalf.style.transform = 'translateX(-100%)'                
                 // Animate right half to the right
                 rightHalf.style.transition = 'transform 1s ease-in-out'
                 rightHalf.style.transform = 'translateX(100%)'

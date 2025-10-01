@@ -1,0 +1,41 @@
+[
+  {
+    "title": "DIGITAL SUPREMACY",
+    "description": "A results-driven digital marketing agency helping brands grow online with strategy, design, and performance marketing.",
+    "industry": "DIGITAL MARKETING",
+    "deliverables": ["WEB DESIGN", "SOCIAL MEDIA STRATEGY", "SEO & ANALYTICS", "BRANDING"],
+    "problem": "Brands struggled with low online visibility and inconsistent digital presence, limiting their growth.",
+    "solution": "We designed a modern digital identity, built conversion-focused websites, and implemented tailored campaigns to drive measurable results.",
+    "images": [
+      { "url": "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&fit=crop&w=1200&q=80" },
+      { "url": "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1200&q=80" },
+      { "url": "https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?auto=format&fit=crop&w=1200&q=80" }
+    ]
+  },
+  {
+    "title": "RADIAN MEDIA",
+    "description": "A creative advertisement agency building bold campaigns and visual identities that connect with audiences.",
+    "industry": "ADVERTISEMENT",
+    "deliverables": ["BRAND STRATEGY", "PRINT & DIGITAL CAMPAIGNS", "VIDEO PRODUCTION", "CREATIVE DIRECTION"],
+    "problem": "Clients needed campaigns that stood out in saturated markets and communicated their value with clarity.",
+    "solution": "We crafted impactful ad campaigns with striking visuals, engaging storytelling, and multi-platform strategies to maximize reach.",
+    "images": [
+      { "url": "https://images.unsplash.com/photo-1551383616-a9e150c07fca?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" },
+      { "url": "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1200&q=80" },
+      { "url": "https://images.unsplash.com/photo-1546142711-1e28c0540deb?q=80&w=1471&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" }
+    ]
+  },
+  {
+    "title": "CODEHUB",
+    "description": "A modern coding academy empowering students to learn programming with hands-on projects and mentorship.",
+    "industry": "EDUCATION",
+    "deliverables": ["COURSE WEBSITE", "E-LEARNING PLATFORM", "BRAND IDENTITY", "STUDENT DASHBOARD"],
+    "problem": "Students lacked access to structured, practical coding education with real-world projects and guidance.",
+    "solution": "We built an interactive platform with structured courses, project-based learning, and progress tracking to make coding accessible for all.",
+    "images": [
+      { "url": "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=1200&q=80" },
+      { "url": "https://plus.unsplash.com/premium_photo-1661877737564-3dfd7282efcb?q=80&w=1500&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" },
+      { "url": "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=1200&q=80" }
+    ]
+  }
+]

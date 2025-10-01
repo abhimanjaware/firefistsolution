@@ -8,6 +8,9 @@ import Navbar from './home-components/Navbar';
 import Loader from './home-components/Loader';
 import Footer from './home-components/Footer';
 import Process from './home-components/Process';
+import About from './home-components/About';
+import Work from './home-components/Work';
+import WebDesignWork from './work/page';
 
 const familjen = Familjen_Grotesk({
   subsets: ['latin'],
@@ -16,7 +19,8 @@ const familjen = Familjen_Grotesk({
 
 const gideon = Gideon_Roman({
   subsets: ['latin'],
-  weight: ['400'], // Only one weight available
+  weight: ['400'], 
+  // Only one weight available
 });
 
 
@@ -24,15 +28,18 @@ const gideon = Gideon_Roman({
 
 function page() {
   return (
-   <div className='overflow-x-hidden'>
+   <div className='overflow-x-hidden bg-black'>
      <div className={familjen.className}>
-      <Loader/>
+       <Loader/>
       <Navbar/>
-      <Hero/>
-      <Testimonials/>
+      <Hero/> 
+      <Work/>
       <Services/>
-      <Footer/>
       <Process/>
+      <About/>
+      <Testimonials/>
+      <Footer/>
+      {/* <WebDesignWork/> */}
     </div>
    </div>
   )
