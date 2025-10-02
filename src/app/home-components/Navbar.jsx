@@ -44,6 +44,18 @@ const Navbar = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [lastScrollTop]);
 
+  // Prevent body scroll when menu is open
+  useEffect(() => {
+    if (menuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [menuOpen]);
+
   const handleNavigation = useCallback((e, href) => {
     e.preventDefault();
     if (isTransitioning) return;
@@ -80,18 +92,18 @@ const Navbar = () => {
     if (menuOpen) setMenuOpen(false);
   }, [isTransitioning, menuOpen]);
 
-  const NavLink = ({ item, textSize = "" }) => (
-    <div className="menu-list relative overflow-hidden cursor-pointer  flex justify-end">
+  const NavLink = ({ item, textSize = "", isMobile = false }) => (
+    <div className={`menu-list relative overflow-hidden cursor-pointer ${isMobile ? 'flex justify-center' : 'flex justify-end'}`}>
       <a
         href={item.href}
         onClick={(e) => handleNavigation(e, item.href)}
         className="relative flex flex-row-reverse group transition-all duration-300"
       >
-        <div className="flex flex-col items-center w-full overflow-hidden relative">
+        <div className="flex flex-col items-center w-full overflow-hidden relative py-2">
           <span className={`font-bold font-[Familjen_Grotesk] transition-all duration-300 text-white text-center group-hover:translate-y-[-80%] group-hover:opacity-0 whitespace-nowrap ${textSize}`}>
             {item.name}
           </span>
-          <span className={`absolute font-[Familjen_Grotesk] font-bold transition-all duration-300 text-white text-center opacity-0 group-hover:opacity-100 translate-y-[100%] group-hover:translate-y-0 whitespace-nowrap ${textSize.replace("text-5xl", "text-6xl")}`}>
+          <span className={`absolute font-[Familjen_Grotesk] font-bold transition-all duration-300 text-white text-center opacity-0 group-hover:opacity-100 translate-y-[100%] group-hover:translate-y-0 whitespace-nowrap ${textSize}`}>
             {item.cursive}
           </span>
         </div>
@@ -102,99 +114,110 @@ const Navbar = () => {
   return (
     <>
       {/* Navbar */}
-      <nav className={`fixed top-0 left-0 w-full py-3  flex justify-between items-center z-50 transition-all duration-500 ease-out ${
-        scrollDirection === "down" ? "-translate-y-2 " : "translate-y-0 opacity-100"
+      <nav className={`fixed top-0 left-0 w-full py-4 sm:py-5 md:py-6 px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12 flex justify-between items-center z-[100] transition-all duration-500 ease-out ${
+        scrollDirection === "down" ? "-translate-y-2" : "translate-y-0 opacity-100"
       }`}>
-        <div className="absolute inset-0 bg-black/10 backdrop-blur-sm z-[-1] mix-blend-difference pointer-events-none" />
+        <div className="absolute inset-0 bg-black/10 backdrop-blur-sm z-[-1] pointer-events-none" />
 
         {/* Logo */}
-        <a href="/" onClick={(e) => handleNavigation(e, "/")}>
-          {/* <img
-            alt="logo"
-            src="/logogogogogo.png"
-            className="w-[16vw] md:w-[9vw] lg:w-[4.5vw] brightness-200 saturate-200 contrast-0 transition-transform duration-300 hover:scale-105"
-          /> */}
-          <h3 className="text-white font-[Familjen_Grotesk] tracking-wide font-black  " style={{fontSize:"1.5vw", padding:"20px 20px"}} >FIREFIST SOLUTIONS</h3>
+        <a 
+          href="/" 
+          onClick={(e) => handleNavigation(e, "/")} 
+          className="flex-shrink-0 max-w-[65%] sm:max-w-[70%] lg:max-w-none z-[101]"
+        >
+          <h3 className="text-white font-[Familjen_Grotesk] tracking-wide font-black text-[5vw] xs:text-[4.5vw] sm:text-[3.5vw] md:text-[2.8vw] lg:text-[2vw] xl:text-[1.8vw] leading-tight">
+            FIREFIST SOLUTIONS
+          </h3>       
         </a>
 
         {/* Desktop Menu */}
-        <div style={{paddingRight:"30px"}} className={`hidden lg:block transition-all   duration-500 ease-out ${
+        <div className={`hidden lg:flex items-center transition-all duration-500 ease-out ${
           scrollDirection === "down" ? "opacity-0 -translate-y-5 pointer-events-none" : "opacity-100 translate-y-0"
         }`}>
-          <ul className="flex gap-8 text-white text-[.9vw]">
+          <ul className="flex gap-4 xl:gap-8 text-white">
             {menuItems.map((item, index) => (
               <li key={index} className="transition-transform duration-300 hover:scale-105">
-                <NavLink item={item} textSize="text-[1vw]" />
+                <NavLink item={item} textSize="text-[1.1vw] xl:text-[1vw]" />
               </li>
             ))}
           </ul>
         </div>
 
-        {/* Mobile Menu Button */}
+        {/* Mobile Menu Button - Custom Hamburger */}
         <button
           onClick={() => setMenuOpen(!menuOpen)}
-          className="lg:hidden text-white text-3xl z-50 transition-transform duration-300 hover:scale-110 active:scale-95"
+          className="lg:hidden z-[102] transition-all duration-300 hover:scale-110 active:scale-95 flex-shrink-0 w-9 h-9 sm:w-10 sm:h-10 flex flex-col items-center justify-center gap-1.5 relative group"
           aria-label="Toggle menu"
         >
-          <ion-icon name={menuOpen ? "close-outline" : "menu-outline"}></ion-icon>
+          <span className={`block w-5 h-[2px] bg-white/70 transition-all duration-300 ${menuOpen ? 'rotate-45 translate-y-[7px] bg-white' : ''}`}></span>
+          <span className={`block w-5 h-[2px] bg-white/70 transition-all duration-300 ${menuOpen ? 'opacity-0' : 'opacity-100'}`}></span>
+          <span className={`block w-5 h-[2px] bg-white/70 transition-all duration-300 ${menuOpen ? '-rotate-45 -translate-y-[7px] bg-white' : ''}`}></span>
         </button>
       </nav>
 
-      {/* Mobile Menu */}
-      <div className={`fixed top-0 left-0 w-full h-full bg-[#27170e] z-40 flex flex-col items-end px-4 justify-center transition-all duration-500 ease-out ${
-        menuOpen ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0 pointer-events-none"
-      }`}>
-        <ul className="flex flex-col gap-6 text-white text-3xl font-extrabold text-center">
-          {menuItems.map((item, index) => (
-            <li
-              key={index}
-              className={`transition-all duration-500 ${
-                menuOpen ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
-              }`}
-              style={{ transitionDelay: menuOpen ? `${index * 0.1}s` : "0s" }}
-            >
-              <NavLink item={item} textSize="text-5xl" />
-            </li>
-          ))}
-        </ul>
+      {/* Mobile Menu Overlay */}
+      <div 
+        className={`fixed inset-0 z-[99] flex flex-col items-center justify-center transition-all duration-500 ease-out ${
+          menuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+        }`}
+      >
+        {/* Backdrop */}
+        <div className="absolute inset-0 bg-black/80 backdrop-blur-xl"></div>
+        
+        {/* Content */}
+        <div className="relative z-10 w-full max-w-2xl px-6 sm:px-8 md:px-12 flex flex-col items-center">
+          <ul className="flex flex-col gap-4 sm:gap-5 md:gap-6 text-white font-extrabold text-center w-full mb-16 sm:mb-20">
+            {menuItems.map((item, index) => (
+              <li
+                key={index}
+                className={`transition-all duration-500 ${
+                  menuOpen ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
+                }`}
+                style={{ transitionDelay: menuOpen ? `${index * 0.08}s` : "0s" }}
+              >
+                <NavLink item={item} textSize="text-3xl sm:text-4xl md:text-5xl lg:text-6xl" isMobile={true} />
+              </li>
+            ))}
+          </ul>
 
-        {/* Social Icons */}
-        <div className={`flex gap-4 pt-10 transition-all duration-500 ${
-          menuOpen ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
-        }`} style={{ transitionDelay: menuOpen ? "0.5s" : "0s" }}>
-          {socialLinks.map((social, index) => (
+          {/* Social Icons */}
+          <div className={`flex gap-4 sm:gap-5 mb-10 sm:mb-12 transition-all duration-500 ${
+            menuOpen ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
+          }`} style={{ transitionDelay: menuOpen ? "0.4s" : "0s" }}>
+            {socialLinks.map((social, index) => (
+              <a
+                key={index}
+                href={social.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-white/90 text-black p-3 sm:p-3.5 rounded-full hover:scale-110 hover:bg-white active:scale-95 transition-all duration-300 flex items-center justify-center shadow-lg backdrop-blur-sm"
+                aria-label={social.name}
+              >
+                <ion-icon name={social.name} style={{ fontSize: '22px' }}></ion-icon>
+              </a>
+            ))}
+          </div>
+
+          {/* CTA Button */}
+          <div className={`transition-all duration-500 ${
+            menuOpen ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
+          }`} style={{ transitionDelay: menuOpen ? "0.5s" : "0s" }}>
             <a
-              key={index}
-              href={social.href}
+              href="https://wa.me/919689762896"
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-white text-[#27170e] p-3 rounded-full hover:scale-110 active:scale-95 transition-transform duration-300"
-              aria-label={social.name}
+              className="bg-white text-black px-10 py-4 sm:px-12 sm:py-5 rounded-full font-bold text-base sm:text-lg shadow-xl hover:scale-105 hover:shadow-2xl active:scale-95 transition-all duration-300 inline-block"
             >
-              <ion-icon name={social.name} size="small"></ion-icon>
+              Let's Connect
             </a>
-          ))}
-        </div>
-
-        {/* CTA Button */}
-        <div className={`pt-8 transition-all duration-500 ${
-          menuOpen ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
-        }`} style={{ transitionDelay: menuOpen ? "0.6s" : "0s" }}>
-          <a
-            href="https://wa.me/919689762896"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="bg-[#d9d9d9] text-[#27170e] px-6 py-3 rounded-full font-semibold text-base shadow-md hover:scale-105 active:scale-95 transition-all duration-300"
-          >
-            Let's Connect
-          </a>
+          </div>
         </div>
       </div>
 
       {/* Page Transition Layers */}
-      <div className="page-transition fixed top-0 left-0 w-screen h-screen bg-black z-40 translate-y-full"></div>
-      <div className="page-transition-1 fixed top-0 left-0 w-screen h-screen bg-[#d9d9d9a2] z-50 translate-y-full"></div>
-      <div className="page-transition-2 fixed top-0 left-0 w-screen h-screen bg-[#27170e] z-60 translate-y-full"></div>
+      <div className="page-transition fixed top-0 left-0 w-screen h-screen bg-black z-[90] translate-y-full pointer-events-none"></div>
+      <div className="page-transition-1 fixed top-0 left-0 w-screen h-screen bg-[#d9d9d9a2] z-[91] translate-y-full pointer-events-none"></div>
+      <div className="page-transition-2 fixed top-0 left-0 w-screen h-screen bg-[#27170e] z-[92] translate-y-full pointer-events-none"></div>
     </>
   );
 };
