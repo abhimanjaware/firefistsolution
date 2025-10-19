@@ -2,259 +2,323 @@
 import { useRef, useEffect, useState } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import projects from './projects.json';
-import Navbar from '../home-components/Navbar';
 
 gsap.registerPlugin(ScrollTrigger);
 
+// Mock projects data
+const projects = [
+  {
+    industry: "E-Commerce",
+    title: "Luxury Fashion Platform",
+    description: "A sophisticated e-commerce experience designed to elevate brand presence and drive conversions through intuitive design and seamless user journeys.",
+    deliverables: ["UI/UX Design", "Brand Identity", "Responsive Development", "Performance Optimization"],
+    problem: "The existing platform lacked visual appeal and had a complex checkout process that led to high cart abandonment rates.",
+    solution: "We redesigned the entire user experience with a focus on visual storytelling, simplified navigation, and a streamlined one-page checkout that increased conversions by 47%.",
+    images: [  
+      { url: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1200&h=800&fit=crop" },
+      { url: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&h=800&fit=crop" },
+      { url: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=1200&h=800&fit=crop" }
+    ]
+  },
+  {
+    industry: "Technology",
+    title: "SaaS Dashboard Redesign",
+    description: "Complete overhaul of a complex enterprise dashboard to improve usability, data visualization, and overall user satisfaction.",
+    deliverables: ["Product Design", "Design System", "Interactive Prototypes", "User Testing"],
+    problem: "Users struggled to find key metrics and perform routine tasks efficiently, leading to poor adoption rates and increased support tickets.",
+    solution: "We created a modular, customizable dashboard with intuitive data visualization and contextual help, reducing time-to-task by 60% and support tickets by 35%.",
+    images: [
+      { url: "https://images.unsplash.com/photo-1551650975-87deedd944c3?w=1200&h=800&fit=crop" },
+      { url: "https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?w=1200&h=800&fit=crop" },
+      { url: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=1200&h=800&fit=crop" }
+    ]
+  }
+];
+
 const WebDesignWork = ({ toggleContactForm }) => {
-  const [imageLoaded, setImageLoaded] = useState({});
-  const refs = {
-    container: useRef(null),
-    leftSec: useRef([]),
-    rightSec: useRef([]),
-    projectContainers: useRef([]),
-    cta: useRef(null),
-    imageContainers: useRef([])
-  };
+  const containerRef = useRef(null);
 
   useEffect(() => {
-    const isMobile = window.innerWidth < 1024;
     const ctx = gsap.context(() => {
-      refs.projectContainers.current.forEach((section, i) => {
-        if (!section) return;
-        const left = section.querySelector('.left-section');
+      const isMobile = window.innerWidth < 1024;
 
-        ScrollTrigger.create({
-          trigger: section,
-          start: isMobile ? "top 85%" : "top 75%",
-          onEnter: () => {
-            if (left?.children) gsap.to(left.children, { 
-              opacity: 1, y: 0, duration: 0.8, stagger: 0.15, ease: "power2.out" 
-            });
-          },
-          toggleActions: "play none none none"
-        });
-
-        if (!isMobile) {
-          const rights = refs.rightSec.current.slice(i * 3, (i + 1) * 3);
-          if (refs.leftSec.current[i] && rights[0] && rights[2]) {
-            ScrollTrigger.create({
-              trigger: rights[0],
-              start: "top top",
-              end: () => `+=${rights[2].offsetHeight * 2.5}`,
-              pin: refs.leftSec.current[i],
-              pinSpacing: false,
-              anticipatePin: 1
-            });
+      // Animate project sections
+      gsap.utils.toArray('.project-text').forEach((text) => {
+        gsap.from(text.children, {
+          opacity: 0,
+          y: 30,
+          duration: 0.8,
+          stagger: 0.1,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: text,
+            start: "top 80%",
           }
-        }
-      });
-
-      refs.rightSec.current.forEach(section => {
-        if (!section) return;
-        const image = section.querySelector('img');
-        ScrollTrigger.create({
-          trigger: section,
-          start: isMobile ? "top 85%" : "top 80%",
-          onEnter: () => gsap.to(image, { opacity: 1, y: 0, scale: 1, duration: 0.9, ease: "power2.out" }),
-          toggleActions: "play none none none"
         });
       });
 
-      if (refs.cta.current?.children) {
-        ScrollTrigger.create({
-          trigger: refs.cta.current,
-          start: "top 80%",
-          onEnter: () => gsap.to(refs.cta.current.children, { 
-            opacity: 1, y: 0, scale: 1, duration: 0.8, stagger: 0.15, ease: "back.out(1.6)" 
-          }),
-          toggleActions: "play none none none"
+      // Animate images
+      gsap.utils.toArray('.project-image').forEach((img) => {
+        gsap.from(img, {
+          opacity: 0,
+          y: 50,
+          scale: 0.95,
+          duration: 1,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: img,
+            start: "top 85%",
+          }
+        });
+      });
+
+      // Pin left sections on desktop
+      if (!isMobile) {
+        gsap.utils.toArray('.pin-section').forEach((section) => {
+          ScrollTrigger.create({
+            trigger: section,
+            start: "top top",
+            end: "bottom bottom",
+            pin: section.querySelector('.pin-content'),
+            pinSpacing: false,
+          });
         });
       }
 
-      ScrollTrigger.refresh();
-    }, refs.container);
+      // Animate CTA
+      gsap.from('.cta-section > *', {
+        opacity: 0,
+        y: 30,
+        duration: 0.8,
+        stagger: 0.15,
+        ease: "power2.out",
+        scrollTrigger: {
+          trigger: '.cta-section',
+          start: "top 80%",
+        }
+      });
+
+    }, containerRef);
 
     return () => ctx.revert();
   }, []);
 
-  const ImageDisplay = ({ image, index }) => {
-    const imageKey = `img-${index}`;
-    return (
-      <div
-        ref={el => (refs.imageContainers.current[index] = el)}
-        className="image-container relative overflow-hidden rounded-xl shadow-2xl h-[60vw] sm:h-[45vw] md:h-[35vw] lg:h-[28vw] cursor-pointer transform transition-all duration-500 bg-black"
-        onMouseEnter={e => {
-          const imgEl = e.currentTarget.querySelector('img');
-          gsap.to(imgEl, { scale: 1.05, duration: 0.4, ease: "power2.out" });
-        }}
-        onMouseLeave={e => {
-          const imgEl = e.currentTarget.querySelector('img');
-          gsap.to(imgEl, { scale: 1, duration: 0.4, ease: "power2.out" });
-        }}
-      >
-        <img 
-          src={image.url} 
-          alt="project showcase" 
-          className={`w-full h-full object-cover transition-all duration-300 ease-out ${imageLoaded[imageKey] ? 'opacity-100' : 'opacity-0'}`} 
-          onLoad={() => setImageLoaded(prev => ({ ...prev, [imageKey]: true }))}
-        />
-      </div>
-    );
-  };
-
   return (
-    <>
-    <Navbar/>
-     <div className="overflow-hidden relative bg-black text-white" ref={refs.container}>
-      {projects.map((project, i) => (
-        <div key={i} className="flex flex-col lg:flex-row min-h-[100vh] lg:min-h-[300vh]" ref={el => (refs.projectContainers.current[i] = el)}>
-          {/* LEFT TEXT SECTION */}
-          <div ref={el => (refs.leftSec.current[i] = el)} className="w-full lg:w-[35vw] bg-zinc-950/50 hidden lg:flex    sticky top-0 h-screen" style={{padding:"25px 25px"}}>
-            <div className="text-left px-6 xl:px-10 left-section max-w-md space-y-6">
-              <br />
-              <span className="text-green-400 font-semibold tracking-wide text-sm uppercase">{project.industry}</span>
-              
-              <h3 className="text-white font-extrabold text-[2.9vw] leading-tight uppercase">{project.title}</h3>
-              <p className="text-gray-300 text-base leading-relaxed">{project.description}</p>
-              
-              <div>
+    <div ref={containerRef} className="bg-black text-white">
+      {projects.map((project, idx) => (
+        <div key={idx} className="flex flex-col lg:flex-row min-h-screen">
+          
+          {/* LEFT - Text Content (Desktop) */}
+          <div className="hidden lg:block lg:w-[40%] pin-section">
+            <div className="pin-content sticky top-0 h-screen flex items-center bg-zinc-950 px-12 xl:px-16">
+              <div className="project-text max-w-xl w-full space-y-8 pt-16">
+                
+                {/* Header */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <span className="h-[2px] w-8 bg-green-400"></span>
+                    <span className="text-green-400 text-xs uppercase tracking-widest font-semibold">
+                      {project.industry}
+                    </span>
+                  </div>
+                  <h2 className="text-5xl xl:text-8xl font-bold leading-tight">{project.title}</h2>
+                </div>
+                <br />
+
+                <p className="text-gray-300 text-lg leading-relaxed">{project.description}</p>
+
+<br />
+                {/* Deliverables */}
+                <div className="space-y-4">
+                  <h3 className="text-green-400 text-sm uppercase tracking-wider font-semibold">Deliverables</h3>
+                  <div className="flex flex-wrap gap-3">
+                    {project.deliverables.map((item, i) => (
+                      <span key={i} className="px-4 py-2 bg-zinc-900 border border-zinc-800 rounded-full text-sm text-gray-300">
+                        {item}
+                      </span>
+                    ))}
+                  </div>
+                </div>
 
                 <br />
+
+                {/* Problem & Solution */}
+                <div className="space-y-6">
+                  <div className="space-y-3">
+                    <h3 className="text-green-400 text-sm uppercase tracking-wider font-semibold">Problem</h3>
+                    <p className="text-gray-300 leading-relaxed">{project.problem}</p>
+                  </div>
+
+<br />
+                  <div className="space-y-3">
+                    <h3 className="text-green-400 text-sm uppercase tracking-wider font-semibold">Solution</h3>
+                    <p className="text-gray-300 leading-relaxed">{project.solution}</p>
+                  </div>
+                </div>
                 <br />
-                <h5 className="text-green-400 font-medium text-9xlxl uppercase mb-2">Deliverables</h5>
-                <ul className="space-y-1 text-gray-200 text-sm">
-                  {project.deliverables.map((d, idx) => <li key={idx}>• {d}</li>)}
-                </ul>
+
+                {/* CTA Buttons */}
+                <div className="flex flex-col  sm:flex-row gap-4 pt-4">
+                  {/* <button
+                    onClick={toggleContactForm}
+                    className="px-8 py-4 bg-white text-black font-semibold text-sm rounded-full 
+                             hover:bg-green-400 hover:scale-105 transition-all duration-300"
+                  >
+                    VIEW PROJECT
+                  </button> */}
+                  
+                  <button className="px-8 py-4 border  border-gray-600 text-white font-semibold text-sm rounded-full 
+                             hover:border-green-400 hover:text-green-400 transition-all duration-300" style={{backgroundColor:"green", padding: "3px 5px", borderRadius:"4px"}}>
+                    VISIT SITE
+                  </button>
+                </div>
+
               </div>
-
-                <br />
-                <br />
-
-              <div>
-                <h5 className="text-green-400 font-medium text-9xlxl uppercase mb-2">Problem</h5>
-                <p className="text-gray-300 text-sm leading-relaxed">{project.problem}</p>
-              </div>
-               
-  <br />
-                <br />
-
-              <div>
-                <h5 className="text-green-400 font-medium text-9xlxl uppercase mb-2">Solution</h5>
-                <p className="text-gray-300 text-sm leading-relaxed">{project.solution}</p>
-              </div>
-
-
-
-<br /><br />
-              {/* button */}
-          <div className="flex items-center">
-  <div className="w-[100px] md:w-[140px] hover:w-[160px] md:hover:w-[200px] relative h-[6vh] md:h-[6vh] flex justify-center items-center rounded-xl cursor-pointer group overflow-hidden z-[50] transition-all duration-500 ease-in-out">
-    {/* Background layer */}
-    <div className="absolute inset-0 bg-gradient-to-r from-white to-green-400 rounded-xl transition-all duration-500 ease-in-out"></div>
-
-    {/* Text layer */}
-    <p className="relative text-xs md:text-[0.9vw] text-black font-medium z-10 transition-all duration-500 ease-in-out group-hover:tracking-wider group-hover:text-sm md:group-hover:text-[1vw] group-hover:text-black">
-      CONNECT US
-    </p>
-  </div>
-</div>
-
             </div>
           </div>
 
-          {/* RIGHT IMAGES SECTION */}
-         <div className="w-full lg:w-[70vw]">
-  {project.images.map((image, j) => (
-    <div 
-      key={j} 
-      ref={el => (refs.rightSec.current[i * 3 + j] = el)} 
-      className={`min-h-screen flex items-center justify-center p-4 sm:p-6 md:p-8 ${j % 2 === 0 ? "bg-black" : "bg-black"}`}
-    >
-      <div className="w-full max-w-6xl flex items-center justify-center ">
-        <ImageDisplay 
-          image={image} 
-          index={i * 3 + j} 
-          className="w-auto h-[120vh] object-contain" 
-        />
-      </div>
-    </div>
-  ))}
-</div>
+          {/* RIGHT - Images */}
+          <div className="lg:w-[60%]">
+            
+            {/* Mobile Text Header */}
+            <br />
+            <div className="lg:hidden px-6 py-12 bg-zinc-950 project-text">
+              <div className="space-y-6 pt-8">
+                <div className="flex items-center gap-3">
+                  <span className="h-[2px] w-8 bg-green-400"></span>
+                  <span className="text-green-400 text-xs uppercase tracking-widest font-semibold">
+                    {project.industry}
+                  </span>
+                </div>
+                <h2 className="text-3xl font-bold leading-tight">{project.title}</h2>
+                <p className="text-gray-300 text-base leading-relaxed">{project.description}</p>
+                
+                <div className="space-y-4 pt-2">
+                  <h3 className="text-green-400 text-sm uppercase tracking-wider font-semibold">Deliverables</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {project.deliverables.map((item, i) => (
+                      <span key={i} className="px-3 py-1.5 bg-zinc-900 border border-zinc-800 rounded-full text-sm text-gray-300">
+                        {item}
+                      </span>
+                    ))}
+                  </div>
+                </div>
 
+
+              </div>
+            </div>
+
+              {/* Mobile Problem/Solution */}
+              <div className="lg:hidden px-6 py-12 bg-zinc-950 space-y-8">
+              <div className="space-y-3">
+                <h3 className="text-green-400 text-sm uppercase tracking-wider font-semibold">Problem</h3>
+                <p className="text-gray-300 leading-relaxed">{project.problem}</p>
+              </div>
+              <div className="space-y-3">
+                <h3 className="text-green-400 text-sm uppercase tracking-wider font-semibold">Solution</h3>
+                <p className="text-gray-300 leading-relaxed">{project.solution}</p>
+              </div>
+            </div>
+
+                            {/* Mobile CTA Buttons */}
+                <br />
+                <div className="flex flex-col items-start gap-3 pt-4 lg:hidden">
+                  {/* <button
+                    onClick={toggleContactForm}
+                    className="px-6 py-3 bg-white text-black font-semibold text-sm rounded-full 
+                             hover:bg-green-400 transition-all duration-300"
+                  >
+                    VIEW PROJECT
+                  </button> */}
+                  <button className="px-6 py-3 border  border-gray-600 text-white font-semibold text-sm rounded-full 
+                             hover:border-green-400 hover:text-green-400 transition-all duration-300" style={{backgroundColor:"green", padding: "3px 5px", borderRadius:"4px"}}>
+                    VISIT SITE
+                  </button>
+                  <br />
+                </div>
+
+            {/* Images */}
+            {project.images.map((image, i) => (
+              <div key={i} className="min-h-[40vh]  lg:min-h-screen  flex items-center justify-center p-6 lg:p-12">
+                <div className="w-full max-w-5xl">
+                  <br />
+                  <div className="project-image group relative overflow-hidden rounded-2xl shadow-2xl  h-[50vh] lg:h-[70vh] cursor-pointer">
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10"></div>
+                    <img
+                      src={image.url}
+                      alt={`${project.title} showcase`}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                      loading="lazy"
+                    />
+                  </div>
+                </div>
+              </div>
+            ))}
+
+            
+          
+
+          </div>
         </div>
       ))}
 
-      {/* CTA SECTION */}
-<div 
-  ref={refs.cta} 
-  className="min-h-screen relative flex items-center justify-center overflow-hidden"
->
-  {/* Animated Gradient Background */}
-  <div className="absolute inset-0 bg-gradient-to-br from-black via-green-950 to-black animate-gradient" />
-
-  {/* Overlay with soft glow */}
-  <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
-
-  {/* Decorative floating shapes */}
-  <div className="absolute inset-0 overflow-hidden">
-    <div className="absolute top-20 left-10 w-40 h-40 bg-green-500/20 rounded-full blur-3xl animate-pulse" />
-    <div className="absolute bottom-20 right-16 w-56 h-56 bg-green-400/10 rounded-full blur-2xl animate-bounce-slow" />
-  </div>
-
-  <div className="relative text-center text-white max-w-4xl px-6">
-    {/* Subtitle with accent line */}
-    <div className="flex items-center justify-center gap-4 mb-6">
-      <span className="h-[2px] w-12 bg-green-400" />
-      <p className="uppercase tracking-[0.3em] text-sm sm:text-xl text-green-400">
-        Let’s Work Together
-      </p>
-      <span className="h-[2px] w-12 bg-green-400" />
+      {/* CTA Section */}
+<div className="min-h-screen flex items-center justify-center px-6 py-24 bg-gradient-to-br from-zinc-900 to-black text-white">
+  <section className="max-w-4xl w-full text-center space-y-16">
+    
+    {/* Subtitle */}
+    <div className="flex items-center justify-center gap-4 text-base text-green-400 tracking-widest uppercase font-medium">
+      <span className="h-px w-12 bg-green-400" />
+      Let's Create Together
+      <span className="h-px w-12 bg-green-400" />
     </div>
 
+ 
 <br />
-    {/* Subheading */}
-    <p className="text-gray-300 text-lg sm:text-xl md:text-4xl mb-12   leading-none">
-      Let’s build a <span className="text-green-400 font-semibold">digital presence</span> 
-      that inspires trust and drives measurable impact.
+    {/* Description */}
+    <p className="text-gray-400 text-lg sm:text-xl  leading-tight  text-center">
+      Let’s collaborate on digital experiences that are beautiful, functional, and impactful — built to resonate with your audience.
     </p>
+
+<br />
+    {/* CTA Button */}
+    <div>
+      <button
+        onClick={toggleContactForm}
+        className="inline-flex items-center gap-3 px-10 py-4 text-white text-base sm:text-lg font-semibold rounded-full transition-all duration-300 bg-green-500 hover:bg-gradient-to-r hover:from-green-400 hover:to-emerald-500"
+        style={{backgroundColor:"green", padding: "3px 5px", borderRadius:"4px"}}
+      >
+        Start a Project
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+        </svg>
+      </button>
+    </div>
 
     <br />
 
-    {/* Creative Button with ring hover */}
- <div className="flex items-center justify-center">
-  <div
-    className="relative group cursor-pointer w-[180px] md:w-[220px] h-[60px] md:h-[70px] 
-               rounded-2xl overflow-hidden transition-all duration-500 ease-in-out"
-  >
-    {/* Animated background gradient */}
-    <div className="absolute inset-0 bg-gradient-to-r from-green-400 via-emerald-500 to-green-700 
-                    bg-[length:200%_200%] animate-[gradientMove_4s_linear_infinite] opacity-90 
-                    group-hover:opacity-100 transition duration-500 rounded-2xl" />
+    {/* Trust Indicators */}
+    <div className="flex justify-center flex-wrap gap-10 leading-0 text-base text-gray-500 pt-8">
+      {['Fast Response', 'Professional Team', 'Premium Quality'].map((item) => (
+        <div key={item} className="flex items-center gap-2">
+          <svg className="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+            <path
+              fillRule="evenodd"
+              d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+              clipRule="evenodd"
+            />
+          </svg>
+          {item}
+        </div>
+      ))}
+    </div>
 
-    {/* Glow border effect */}
-    <div className="absolute inset-0 rounded-2xl border border-green-400/40 shadow-[0_0_20px_rgba(34,197,94,0.3)] 
-                    group-hover:shadow-[0_0_35px_rgba(34,197,94,0.8)] transition-all duration-500" />
-
-    {/* Text */}
-    <p className="relative z-10 h-full flex items-center justify-center font-bold tracking-wide 
-                  text-sm md:text-lg text-white group-hover:scale-110 group-hover:tracking-[0.2em] 
-                  transition-all duration-500 ease-in-out">
-      START A PROJECT
-    </p>
-  </div>
-</div>
-
-
-  </div>
+  </section>
 </div>
 
 
 
     </div>
-    </>
-   
   );
 };
 

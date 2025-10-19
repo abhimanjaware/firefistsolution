@@ -39,7 +39,7 @@ function page() {
       <About/>
       <Testimonials/>
       <Footer/>
-      {/* <WebDesignWork/> */}
+      <WebDesignWork/>
     </div>
    </div>
   )
